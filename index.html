@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fb">
+  <title>행운번호 — 로또 번호 생성기</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17233c;
+      --muted: #758098;
+      --line: #e8ebf2;
+      --purple: #6747e8;
+      --purple-dark: #5234ce;
+      --surface: #fff;
+      --background: #f5f7fb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 50% -20%, #e8e2ff 0, transparent 48%),
+        var(--background);
+      color: var(--ink);
+      font-family: Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    }
+
+    button { font: inherit; }
+
+    .page {
+      width: min(100% - 40px, 760px);
+      margin: 0 auto;
+      padding: 46px 0 52px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      color: var(--purple);
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 28px;
+      height: 28px;
+      place-items: center;
+      border-radius: 9px;
+      background: var(--purple);
+      color: white;
+      font-size: 17px;
+    }
+
+    header { text-align: center; }
+
+    h1 {
+      margin: 22px 0 9px;
+      font-size: clamp(30px, 6vw, 42px);
+      letter-spacing: -.065em;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .generator-card {
+      margin-top: 32px;
+      padding: 34px 32px 28px;
+      border: 1px solid rgba(228, 231, 240, .9);
+      border-radius: 24px;
+      background: var(--surface);
+      box-shadow: 0 16px 48px rgba(37, 43, 74, .08);
+      text-align: center;
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .12em;
+    }
+
+    .balls {
+      display: flex;
+      min-height: 62px;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(7px, 2vw, 13px);
+      margin: 24px 0 28px;
+    }
+
+    .ball {
+      display: grid;
+      width: clamp(42px, 11vw, 58px);
+      aspect-ratio: 1;
+      place-items: center;
+      border: 1px solid rgba(0, 0, 0, .04);
+      border-radius: 50%;
+      color: #fff;
+      font-size: clamp(16px, 4vw, 21px);
+      font-weight: 800;
+      box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .1), 0 5px 10px rgba(28, 38, 63, .12);
+      animation: pop-in .28s ease-out both;
+    }
+
+    .ball:nth-child(2) { animation-delay: 35ms; }
+    .ball:nth-child(3) { animation-delay: 70ms; }
+    .ball:nth-child(4) { animation-delay: 105ms; }
+    .ball:nth-child(5) { animation-delay: 140ms; }
+    .ball:nth-child(6) { animation-delay: 175ms; }
+
+    .placeholder {
+      color: #c5cad6;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .generate-button {
+      display: inline-flex;
+      min-height: 54px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 0 26px;
+      border: 0;
+      border-radius: 14px;
+      background: var(--purple);
+      color: #fff;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 750;
+      box-shadow: 0 7px 16px rgba(103, 71, 232, .24);
+      transition: background .16s ease, transform .16s ease, box-shadow .16s ease;
+    }
+
+    .generate-button:hover {
+      transform: translateY(-2px);
+      background: var(--purple-dark);
+      box-shadow: 0 10px 20px rgba(103, 71, 232, .3);
+    }
+
+    .generate-button:active { transform: translateY(0); }
+    .generate-button:focus-visible { outline: 3px solid #bcb0ff; outline-offset: 3px; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .stat-card {
+      padding: 23px 24px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+    }
+
+    .stat-heading {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0 0 14px;
+      color: #58647c;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .stat-icon {
+      display: grid;
+      width: 27px;
+      height: 27px;
+      place-items: center;
+      border-radius: 9px;
+      background: #f0edff;
+      color: var(--purple);
+      font-size: 14px;
+    }
+
+    .stat-value {
+      margin: 0;
+      font-size: clamp(21px, 4vw, 28px);
+      font-weight: 800;
+      letter-spacing: -.045em;
+      white-space: nowrap;
+    }
+
+    .stat-caption {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .expectation .stat-value { color: var(--purple); }
+
+    .note {
+      margin: 17px 3px 0;
+      color: #8992a5;
+      font-size: 11px;
+      line-height: 1.7;
+      text-align: center;
+      word-break: keep-all;
+    }
+
+    .note strong { color: #69748c; }
+
+    footer {
+      margin-top: 25px;
+      color: #9aa2b2;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    @keyframes pop-in {
+      from { opacity: 0; transform: scale(.72) translateY(5px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @media (max-width: 560px) {
+      .page { width: min(100% - 28px, 460px); padding-top: 32px; }
+      .generator-card { margin-top: 25px; padding: 28px 17px 23px; border-radius: 20px; }
+      .balls { margin: 23px 0 26px; }
+      .stats { gap: 10px; }
+      .stat-card { padding: 18px 13px; border-radius: 15px; }
+      .stat-heading { gap: 7px; font-size: 12px; }
+      .stat-icon { width: 24px; height: 24px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <div class="brand"><span class="brand-mark" aria-hidden="true">✦</span> 행운번호</div>
+      <h1>오늘의 행운을 뽑아보세요</h1>
+      <p class="subtitle">버튼을 눌러 1부터 45까지의 숫자 중<br>행운의 로또 번호 6개를 만들어보세요.</p>
+    </header>
+
+    <section class="generator-card" aria-label="로또 번호 생성기">
+      <p class="eyebrow">YOUR LUCKY NUMBERS</p>
+      <div class="balls" id="numbers" aria-live="polite" aria-label="생성된 번호">
+        <span class="placeholder">아래 버튼을 눌러 번호를 생성하세요</span>
+      </div>
+      <button class="generate-button" id="generate" type="button">
+        <span aria-hidden="true">↻</span> 행운 번호 생성하기
+      </button>
+    </section>
+
+    <section class="stats" aria-label="로또 당첨 정보">
+      <article class="stat-card">
+        <h2 class="stat-heading"><span class="stat-icon" aria-hidden="true">☆</span> 1등 당첨 확률</h2>
+        <p class="stat-value" id="jackpot-odds">1 / 8,145,060</p>
+        <p class="stat-caption">한 게임 기준 · 약 0.0000123%</p>
+      </article>
+      <article class="stat-card expectation">
+        <h2 class="stat-heading"><span class="stat-icon" aria-hidden="true">₩</span> 1게임 기대값</h2>
+        <p class="stat-value" id="expected-value">계산 중</p>
+        <p class="stat-caption" id="expected-caption">예시 당첨금 기준 예상 수령액</p>
+      </article>
+    </section>
+
+    <p class="note">
+      <strong>기대값 안내:</strong> 1등 20억, 2등 5천만, 3등 150만, 4등 5만, 5등 5천 원의 예시 당첨금을 사용해
+      등수별 확률로 계산한 예상 수령액입니다. 실제 당첨금은 회차별 판매액과 당첨자 수에 따라 달라지며,
+      복권 가격 1,000원을 제외한 손익 기대값도 함께 표시합니다.
+    </p>
+    <footer>로또 6/45 기준 · 번호는 무작위로 생성되며 당첨을 보장하지 않습니다.</footer>
+  </main>
+
+  <script>
+    "use strict";
+
+    const TOTAL_COMBINATIONS = 8_145_060;
+    const TICKET_PRICE = 1_000;
+    const SAMPLE_PRIZES = {
+      first: 2_000_000_000,
+      second: 50_000_000,
+      third: 1_500_000,
+      fourth: 50_000,
+      fifth: 5_000
+    };
+
+    function choose(n, r) {
+      let result = 1;
+      for (let i = 1; i <= r; i += 1) {
+        result = result * (n - i + 1) / i;
+      }
+      return result;
+    }
+
+    function calculateExpectedValue() {
+      const outcomes = [
+        { count: 1, prize: SAMPLE_PRIZES.first },
+        { count: 6, prize: SAMPLE_PRIZES.second },
+        { count: choose(6, 5) * choose(38, 1), prize: SAMPLE_PRIZES.third },
+        { count: choose(6, 4) * choose(39, 2), prize: SAMPLE_PRIZES.fourth },
+        { count: choose(6, 3) * choose(39, 3), prize: SAMPLE_PRIZES.fifth }
+      ];
+      return outcomes.reduce((total, outcome) => total + outcome.count * outcome.prize / TOTAL_COMBINATIONS, 0);
+    }
+
+    function formatWon(amount) {
+      return `${Math.round(amount).toLocaleString("ko-KR")}원`;
+    }
+
+    function renderExpectedValue() {
+      const payout = calculateExpectedValue();
+      const net = payout - TICKET_PRICE;
+      document.getElementById("expected-value").textContent = formatWon(payout);
+      document.getElementById("expected-caption").textContent =
+        `예상 수령액 · 구매비 포함 손익 ${net < 0 ? "−" : "+"}${formatWon(Math.abs(net))}`;
+    }
+
+    function generateNumbers() {
+      const pool = Array.from({ length: 45 }, (_, index) => index + 1);
+      for (let i = pool.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+      }
+      const selected = pool.slice(0, 6).sort((a, b) => a - b);
+      const container = document.getElementById("numbers");
+      container.replaceChildren(...selected.map((number) => {
+        const ball = document.createElement("span");
+        ball.className = "ball";
+        ball.textContent = number;
+        ball.style.backgroundColor = getBallColor(number);
+        ball.setAttribute("aria-label", `${number}`);
+        return ball;
+      }));
+      container.setAttribute("aria-label", `생성된 번호: ${selected.join(", ")}`);
+    }
+
+    function getBallColor(number) {
+      if (number <= 10) return "#f4b400";
+      if (number <= 20) return "#4388df";
+      if (number <= 30) return "#e85858";
+      if (number <= 40) return "#858b98";
+      return "#54a96b";
+    }
+
+    document.getElementById("generate").addEventListener("click", generateNumbers);
+    renderExpectedValue();
+  </script>
+</body>
+</html>
